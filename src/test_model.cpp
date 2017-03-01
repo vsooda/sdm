@@ -23,13 +23,13 @@ int main()
         ReadLabelsFromFile(mImageLabels, "labels_ibug_300W_test.xml");
         save_ImageLabels(mImageLabels, "mImageLabels-test.bin");
     }
-    std::cout << "测试数据一共有: " <<  mImageLabels.size() << std::endl;
+    std::cout << "娴嬭瘯鏁版嵁涓�鍏辨湁: " <<  mImageLabels.size() << std::endl;
 	*******************/
 
     ldmarkmodel modelt;
     std::string modelFilePath = "roboman-landmark-model.bin";
     while(!load_ldmarkmodel(modelFilePath, modelt)){
-        std::cout << "文件打开错误，请重新输入文件路径." << std::endl;
+        std::cout << "鏂囦欢鎵撳紑閿欒锛岃閲嶆柊杈撳叆鏂囦欢璺緞." << std::endl;
         std::cin >> modelFilePath;
     }
 

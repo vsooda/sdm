@@ -14,8 +14,8 @@ bool LinearRegressor::learn(cv::Mat &data, cv::Mat &labels, bool isPCA)
     if(this->isPCA){
         cv::Mat mdata = data.colRange(0, data.cols-2).clone();
         cv::PCA FeaturePCA(mdata, cv::Mat(), CV_PCA_DATA_AS_ROW);
-        std::cout << "ÌØÕ÷ÏòÁ¿³ß¶È: " <<FeaturePCA.eigenvectors.size() << std::endl;
-        std::cout << "ÌØÕ÷Öµ³ß¶È:   " <<FeaturePCA.eigenvalues.size() << std::endl;
+        std::cout << "ç‰¹å¾å‘é‡å°ºåº¦: " <<FeaturePCA.eigenvectors.size() << std::endl;
+        std::cout << "ç‰¹å¾å€¼å°ºåº¦:   " <<FeaturePCA.eigenvalues.size() << std::endl;
         double eigensum = cv::sum(FeaturePCA.eigenvalues)[0];
         double lamda = 0.0;
         int index = 0;
@@ -23,7 +23,7 @@ bool LinearRegressor::learn(cv::Mat &data, cv::Mat &labels, bool isPCA)
             lamda += FeaturePCA.eigenvalues.at<float>(i,0);
             if(lamda/eigensum > 0.97){
                 index = i;
-                std::cout << "ÌØÕ÷¸öÊı¿ÉÒÔÑ¹ËõÎª:" << i << "¸ö" << std::endl;
+                std::cout << "ç‰¹å¾ä¸ªæ•°å¯ä»¥å‹ç¼©ä¸º:" << i << "ä¸ª" << std::endl;
                 break;
             }
         }
@@ -41,28 +41,28 @@ bool LinearRegressor::learn(cv::Mat &data, cv::Mat &labels, bool isPCA)
         }
         A.col(A.cols-1) = cv::Mat::ones(A.rows, 1, A.type());
         mdata.release();
-        //×Ô¼ºµÄĞ´µÄ×îĞ¡¶ş³Ë
+        //è‡ªå·±çš„å†™çš„æœ€å°äºŒä¹˜
         cv::Mat AT = A.t();
         cv::Mat ATA = A.t()*A;
         float lambda = 1.50f * static_cast<float>(cv::norm(ATA)) / static_cast<float>(A.rows);
         cv::Mat regulariser = cv::Mat::eye(ATA.size(), ATA.type())*lambda;
         regulariser.at<float>(regulariser.rows-1, regulariser.cols-1) = 0.0f;
         this->x = (ATA + regulariser).inv(cv::DECOMP_LU)*AT*labels;
-        //opencvÌá¹©µÄ×îĞ¡¶ş³Ë
+        //opencvæä¾›çš„æœ€å°äºŒä¹˜
         //cv::solve(A, labels, this->x);
 
 //            this->weights = this->eigenvectors*this->x;
 //            this->eigenvectors.release();
     }else{
         cv::Mat A = data.clone();
-        //×Ô¼ºµÄĞ´µÄ×îĞ¡¶ş³Ë
+        //è‡ªå·±çš„å†™çš„æœ€å°äºŒä¹˜
         cv::Mat AT = A.t();
         cv::Mat ATA = A.t()*A;
         float lambda = 1.50f * static_cast<float>(cv::norm(ATA)) / static_cast<float>(A.rows);
         cv::Mat regulariser = cv::Mat::eye(ATA.size(), ATA.type())*lambda;
         regulariser.at<float>(regulariser.rows-1, regulariser.cols-1) = 0.0f;
         this->weights = (ATA + regulariser).inv(cv::DECOMP_LU)*AT*labels;
-        //opencvÌá¹©µÄ×îĞ¡¶ş³Ë
+        //opencvæä¾›çš„æœ€å°äºŒä¹˜
         //cv::solve(A, labels, this->weights);
     }
     return true; // see todo above
@@ -181,22 +181,22 @@ ldmarkmodel::ldmarkmodel(std::vector<std::vector<int>> LandmarkIndexs, std::vect
 void ldmarkmodel::loadFaceDetModelFile(std::string filePath){
     face_cascade.load(filePath);
     if(face_cascade.empty()){
-        std::cout << "ÈËÁ³¼ì²âÄ£ĞÍ¼ÓÔØÊ§°Ü." << std::endl;
+        std::cout << "äººè„¸æ£€æµ‹æ¨¡å‹åŠ è½½å¤±è´¥." << std::endl;
     }
 }
 
 void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
     assert(HoGParams.size() >= LinearRegressors.size());
     int samplesNum = 800;    //mImageLabels.size()/10;
-    std::cout << "ÇëÊäÈëÑµÁ·Ñù±¾¸öÊı£¬×îÉÙ20¸ö." << std::endl;
+    std::cout << "è¯·è¾“å…¥è®­ç»ƒæ ·æœ¬ä¸ªæ•°ï¼Œæœ€å°‘20ä¸ª." << std::endl;
     std::cin >> samplesNum;
     if(samplesNum < 20)
         samplesNum = 20;
     else if(samplesNum > mImageLabels.size())
         samplesNum = mImageLabels.size();
-    std::cout << "Ò»¹²" << samplesNum << "¸öÑµÁ·Ñù±¾.\n" << std::endl;
+    std::cout << "ä¸€å…±" << samplesNum << "ä¸ªè®­ç»ƒæ ·æœ¬.\n" << std::endl;
 
-    std::cout << "ÊÇ·ñÒÔÁ½ÑÛ¾àÀë±ê×¼¹éÒ»»¯Landmarker×ø±êÆ«²î?\n[Y/N?]" << std::endl;
+    std::cout << "æ˜¯å¦ä»¥ä¸¤çœ¼è·ç¦»æ ‡å‡†å½’ä¸€åŒ–Landmarkeråæ ‡åå·®?\n[Y/N?]" << std::endl;
     std::string t;
     std::cin >> t;
     if(t=="Y" || t=="y")
@@ -204,9 +204,9 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
     else if(t=="N" || t=="n")
         isNormal = false;
     if(isNormal)
-        std::cout << "¹éÒ»»¯×ø±ê.\n" << std::endl;
+        std::cout << "å½’ä¸€åŒ–åæ ‡.\n" << std::endl;
     else
-        std::cout << "²»¹éÒ»»¯×ø±ê.\n" << std::endl;
+        std::cout << "ä¸å½’ä¸€åŒ–åæ ‡.\n" << std::endl;
 
 
     cv::Mat current_shape(samplesNum, meanShape.cols, CV_32FC1);
@@ -254,7 +254,7 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
         float ly = ( shape.at<float>(eyes_index.at(0)+numLandmarks)+shape.at<float>(eyes_index.at(1)+numLandmarks) )*0.5;
         float rx = ( shape.at<float>(eyes_index.at(2))+shape.at<float>(eyes_index.at(3)) )*0.5;
         float ry = ( shape.at<float>(eyes_index.at(2)+numLandmarks)+shape.at<float>(eyes_index.at(3)+numLandmarks) )*0.5;
-        float distance = sqrt( (rx-lx)*(rx-lx)+(ry-ly)*(ry-ly) );//¼ÆËãÁ½ÑÛµÄ¾àÀë
+        float distance = sqrt( (rx-lx)*(rx-lx)+(ry-ly)*(ry-ly) );//è®¡ç®—ä¸¤çœ¼çš„è·ç¦»
         for(int j=0; j<numLandmarks; j++){
             float dx = target_shape.at<float>(i, j) - current_shape.at<float>(i, j);
             float dy = target_shape.at<float>(i, j+numLandmarks) - current_shape.at<float>(i, j+numLandmarks);
@@ -262,11 +262,11 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
         }
     }
     error0 = error0/samplesNum/numLandmarks;
-    std::cout <<"³õÊ¼Îó²îÎª: " << error0 << "\n" << std::endl;
+    std::cout <<"åˆå§‹è¯¯å·®ä¸º: " << error0 << "\n" << std::endl;
 
 
     for(int i=0; i<LinearRegressors.size(); i++){
-        //¿ªÊ¼¼ÆËãÃèÊö×Ó
+        //å¼€å§‹è®¡ç®—æè¿°å­
         int bins = 1;
         for(int j=0; j<HoGParams.at(i).num_bins; j++)
             bins = 2*bins;
@@ -279,7 +279,7 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
                 HogDescriptors.at<float>(j, k) = Descriptor.at<float>(0,k);
             }
         }
-        //ÃèÊö×Ó¼ÆËãÍê³É£¬¿ªÊ¼Ò»´Îµü´ú
+        //æè¿°å­è®¡ç®—å®Œæˆï¼Œå¼€å§‹ä¸€æ¬¡è¿­ä»£
         cv::Mat update_step = target_shape - current_shape;
         int numLandmarks = update_step.cols/2;
         if(isNormal){
@@ -307,7 +307,7 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
             }
         }
         current_shape = current_shape + update_step;
-        //Ò»´Îµü´ú½áÊø£¬¸üĞÂÌİ¶È±ä»¯£¬¼ÆËãÎó²î
+        //ä¸€æ¬¡è¿­ä»£ç»“æŸï¼Œæ›´æ–°æ¢¯åº¦å˜åŒ–ï¼Œè®¡ç®—è¯¯å·®
 
         float error = 0.0f;
         for(int i=0; i<samplesNum; i++){
@@ -316,7 +316,7 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
             float ly = ( shape.at<float>(eyes_index.at(0)+numLandmarks)+shape.at<float>(eyes_index.at(1)+numLandmarks) )*0.5;
             float rx = ( shape.at<float>(eyes_index.at(2))+shape.at<float>(eyes_index.at(3)) )*0.5;
             float ry = ( shape.at<float>(eyes_index.at(2)+numLandmarks)+shape.at<float>(eyes_index.at(3)+numLandmarks) )*0.5;
-            float distance = sqrt( (rx-lx)*(rx-lx)+(ry-ly)*(ry-ly) );//¼ÆËãÁ½ÑÛµÄ¾àÀë
+            float distance = sqrt( (rx-lx)*(rx-lx)+(ry-ly)*(ry-ly) );//è®¡ç®—ä¸¤çœ¼çš„è·ç¦»
             for(int j=0; j<numLandmarks; j++){
                 float dx = target_shape.at<float>(i, j) - current_shape.at<float>(i, j);
                 float dy = target_shape.at<float>(i, j+numLandmarks) - current_shape.at<float>(i, j+numLandmarks);
@@ -324,7 +324,7 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
             }
         }
         error = error/samplesNum/numLandmarks;
-        std::cout << "ÏÖÔÚÆ½¾ùÎó²îÊÇ: " << error << "\n" << std::endl;
+        std::cout << "ç°åœ¨å¹³å‡è¯¯å·®æ˜¯: " << error << "\n" << std::endl;
     }
 }
 
@@ -460,12 +460,12 @@ int ldmarkmodel::track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFac
 
 void ldmarkmodel::printmodel(){
     if(isNormal)
-        std::cout << "ÒÔÁ½ÑÛ¾àÀë¹éÒ»»¯²½³¤" << std::endl;
+        std::cout << "ä»¥ä¸¤çœ¼è·ç¦»å½’ä¸€åŒ–æ­¥é•¿" << std::endl;
     else
-        std::cout << "²»¹éÒ»»¯²½³¤" << std::endl;
-    std::cout << "Ò»¹²" << LinearRegressors.size() << "´Îµü´ú»Ø¹é..." << std::endl;
+        std::cout << "ä¸å½’ä¸€åŒ–æ­¥é•¿" << std::endl;
+    std::cout << "ä¸€å…±" << LinearRegressors.size() << "æ¬¡è¿­ä»£å›å½’..." << std::endl;
     for(int i=0; i<LandmarkIndexs.size(); i++){
-        std::cout <<"µÚ"<<i<<"´Î»Ø¹é: "<<LandmarkIndexs.at(i).size()<<"¸öµã  ";
+        std::cout <<"ç¬¬"<<i<<"æ¬¡å›å½’: "<<LandmarkIndexs.at(i).size()<<"ä¸ªç‚¹  ";
         std::cout << "num_cells:"<<HoGParams.at(i).num_cells<<"  cell_size:"<<HoGParams.at(i).cell_size <<"  num_bins:"<<HoGParams.at(i).num_bins<<"  relative_patch_size:"<<HoGParams.at(i).relative_patch_size<<std::endl;
     }
 }
@@ -498,7 +498,7 @@ void ldmarkmodel::convert(std::vector<int> &full_eyes_Indexs){
         if(flag)
             tar_LandmarkIndex.push_back(t);
     }
-    //¸üĞÂ×ª»»meanShape
+    //æ›´æ–°è½¬æ¢meanShape
     cv::Mat tmp = meanShape.clone();
     meanShape.release();
     meanShape.create(1, tar_LandmarkIndex.size()*2, tmp.type());
@@ -506,7 +506,7 @@ void ldmarkmodel::convert(std::vector<int> &full_eyes_Indexs){
         meanShape.at<float>(i) = tmp.at<float>(tar_LandmarkIndex.at(i));
         meanShape.at<float>(i+tar_LandmarkIndex.size()) = tmp.at<float>(tar_LandmarkIndex.at(i)+tmp.cols/2);
     }
-    //¸üĞÂ×ª»»LandmarkIndexs
+    //æ›´æ–°è½¬æ¢LandmarkIndexs
     for(int i=0; i<LinearRegressors.size(); i++){
         for(int j=0; j<LandmarkIndexs.at(i).size(); j++){
             for(int k=0; k<tar_LandmarkIndex.size(); k++){
@@ -517,7 +517,7 @@ void ldmarkmodel::convert(std::vector<int> &full_eyes_Indexs){
             }
         }
     }
-    //¸üĞÂ×ª»»eyes_index
+    //æ›´æ–°è½¬æ¢eyes_index
     for(int i=0; i<eyes_index.size(); i++){
         bool flag = false;
         for(int j=0; i<tar_LandmarkIndex.size(); j++){
@@ -529,7 +529,7 @@ void ldmarkmodel::convert(std::vector<int> &full_eyes_Indexs){
         }
         assert(flag);
     }
-    //¸üĞÂ×ª»»LinearRegressors
+    //æ›´æ–°è½¬æ¢LinearRegressors
     for(int i=0; i<LinearRegressors.size(); i++){
         LinearRegressors.at(i).convert(tar_LandmarkIndex);
     }
@@ -705,7 +705,7 @@ void ldmarkmodel::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lin
 //        Yaw	  = eav[1];
 //        Roll  = eav[2];
 }
-//¼ÓÔØÄ£ĞÍ
+//åŠ è½½æ¨¡å‹
 bool load_ldmarkmodel(std::string filename, ldmarkmodel &model)
 {
     std::ifstream file(filename, std::ios::binary);
@@ -717,7 +717,7 @@ bool load_ldmarkmodel(std::string filename, ldmarkmodel &model)
     return true;
 }
 
-//±£´æÄ£ĞÍ
+//ä¿å­˜æ¨¡å‹
 void save_ldmarkmodel(ldmarkmodel model, std::string filename)
 {
     std::ofstream file(filename, std::ios::binary);

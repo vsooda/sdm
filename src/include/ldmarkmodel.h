@@ -23,19 +23,19 @@
 
 
 
-#define SDM_NO_ERROR        0       //ÎŞ´íÎó
-#define SDM_ERROR_FACEDET   200     //ÖØĞÂÍ¨¹ıCascadeClassifier¼ì²âµ½ÈËÁ³
-#define SDM_ERROR_FACEPOS   201     //ÈËÁ³Î»ÖÃ±ä»¯½Ï´ó£¬¿ÉÒÉ
-#define SDM_ERROR_FACESIZE  202     //ÈËÁ³´óĞ¡±ä»¯½Ï´ó£¬¿ÉÒÉ
-#define SDM_ERROR_FACENO    203     //ÕÒ²»µ½ÈËÁ³
-#define SDM_ERROR_IMAGE     204     //Í¼Ïñ´íÎó
+#define SDM_NO_ERROR        0       //æ— é”™è¯¯
+#define SDM_ERROR_FACEDET   200     //é‡æ–°é€šè¿‡CascadeClassifieræ£€æµ‹åˆ°äººè„¸
+#define SDM_ERROR_FACEPOS   201     //äººè„¸ä½ç½®å˜åŒ–è¾ƒå¤§ï¼Œå¯ç–‘
+#define SDM_ERROR_FACESIZE  202     //äººè„¸å¤§å°å˜åŒ–è¾ƒå¤§ï¼Œå¯ç–‘
+#define SDM_ERROR_FACENO    203     //æ‰¾ä¸åˆ°äººè„¸
+#define SDM_ERROR_IMAGE     204     //å›¾åƒé”™è¯¯
 
-#define SDM_ERROR_ARGS      400     //²ÎÊı´«µİ´íÎó
-#define SDM_ERROR_MODEL     401     //Ä£ĞÍ¼ÓÔØ´íÎó
+#define SDM_ERROR_ARGS      400     //å‚æ•°ä¼ é€’é”™è¯¯
+#define SDM_ERROR_MODEL     401     //æ¨¡å‹åŠ è½½é”™è¯¯
 
 
 
-//»Ø¹éÆ÷Àà
+//å›å½’å™¨ç±»
 class LinearRegressor{
 
 public:
@@ -125,10 +125,10 @@ private:
     }
 };
 
-//¼ÓÔØÄ£ĞÍ
+//åŠ è½½æ¨¡å‹
 bool load_ldmarkmodel(std::string filename, ldmarkmodel &model);
 
-//±£´æÄ£ĞÍ
+//ä¿å­˜æ¨¡å‹
 void save_ldmarkmodel(ldmarkmodel model, std::string filename);
 
 

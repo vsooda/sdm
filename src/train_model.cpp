@@ -23,7 +23,7 @@ int main()
         ReadLabelsFromFile(mImageLabels);
         save_ImageLabels(mImageLabels, "mImageLabels-train.bin");
     }
-    std::cout << "训练数据一共有: " <<  mImageLabels.size() << std::endl;
+    std::cout << "璁粌鏁版嵁涓�鍏辨湁: " <<  mImageLabels.size() << std::endl;
 
 
     vector<vector<int>> LandmarkIndexs;
