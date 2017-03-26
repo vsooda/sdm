@@ -21,8 +21,8 @@ aux_source_directory("src/include" SOURCES_FILE)
 
 #ADD_LIBRARY(SRC ${SOURCES_FILE})
 
-ADD_EXECUTABLE(Train-SDM src/train_model.cpp src/include/sdm.cpp src/include/hog.c)
+ADD_EXECUTABLE(Train-SDM src/train_model.cpp src/include/sdm.cpp src/include/hog.cpp src/include/feature_descriptor.cpp)
 TARGET_LINK_LIBRARIES(Train-SDM ${OpenCV_LIBS})
 
-ADD_EXECUTABLE(Roboman-SDM-TEST src/test_model.cpp src/include/sdm.cpp src/include/hog.c)
+ADD_EXECUTABLE(Roboman-SDM-TEST src/test_model.cpp src/include/sdm.cpp src/include/hog.cpp src/include/feature_descriptor.cpp)
 TARGET_LINK_LIBRARIES(Roboman-SDM-TEST ${OpenCV_LIBS})
