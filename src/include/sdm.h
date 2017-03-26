@@ -95,6 +95,7 @@ public:
     float getPitch();
     float getRoll();
     float getYaw();
+    std::vector<cv::Point2f> getPts();
 
 private:
     cv::Rect faceBox;
@@ -109,6 +110,7 @@ private:
     std::vector<LinearRegressor> LinearRegressors;
     cv::Mat estimateHeadPoseMat;
     cv::Mat estimateHeadPoseMat2;
+    std::vector<cv::Point2f> pts_;
     int *estimateHeadPosePointIndexs;
     friend class cereal::access;
     /**

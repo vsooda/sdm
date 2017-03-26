@@ -119,14 +119,11 @@ int main()
             cv::Vec3d eav = modelt.EstimateHeadPose(current_shape);
             modelt.drawPose(Image, current_shape, eav, 50);
 
-            int numLandmarks = current_shape.cols/2;
-            for(int j=0; j<numLandmarks; j++){
-                int x = current_shape.at<float>(j);
-                int y = current_shape.at<float>(j + numLandmarks);
-                std::stringstream ss;
-                ss << j;
+            std::vector<cv::Point2f> pts = modelt.getPts();
+
+            for(int j=0; j < pts.size(); j++){
                 //cv::putText(Image, ss.str(), cv::Point(x, y), 0.5, 0.5, cv::Scalar(0, 0, 255));
-                cv::circle(Image, cv::Point(x, y), 2, cv::Scalar(0, 0, 255), -1);
+                cv::circle(Image, pts[j], 2, cv::Scalar(0, 0, 255), -1);
             }
         }
         cv::imshow("Camera", Image);
@@ -136,8 +133,6 @@ int main()
             break;
         }
     }
-
-    system("pause");
     return 0;
 }
 

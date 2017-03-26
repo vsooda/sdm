@@ -343,7 +343,19 @@ int sdm::detectPoint(const cv::Mat& src, cv::Mat& current_shape, cv::Rect faceBo
         }
         current_shape = current_shape + update_step;
     }
+
+    pts_.clear();
+    for(int j=0; j<numLandmarks; j++){
+        int x = current_shape.at<float>(j);
+        int y = current_shape.at<float>(j + numLandmarks);
+        pts_.push_back(cv::Point2f(x, y));
+    }
+        
     return 0;
+}
+
+std::vector<cv::Point2f> sdm::getPts() {
+    return pts_;
 }
 
 void sdm::printmodel(){
