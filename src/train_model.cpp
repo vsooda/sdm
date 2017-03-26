@@ -9,7 +9,7 @@
 
 
 #include "modelcfg.h"
-#include "ldmarkmodel.h"
+#include "sdm.h"
 
 using namespace std;
 using namespace cv;
@@ -44,9 +44,9 @@ int main()
     vector<HoGParam> HoGParams{{ VlHogVariant::VlHogVariantUoctti, 4, 11, 4, 0.9f },{ VlHogVariant::VlHogVariantUoctti, 4, 10, 4, 0.7f },{ VlHogVariant::VlHogVariantUoctti, 4, 9, 4, 0.5f },{ VlHogVariant::VlHogVariantUoctti, 4, 8, 4, 0.3f }, { VlHogVariant::VlHogVariantUoctti, 4, 6, 4, 0.2f } };
     vector<LinearRegressor> LinearRegressors(5);
 
-    ldmarkmodel model(LandmarkIndexs, eyes_index, mean_shape, HoGParams, LinearRegressors);
+    sdm model(LandmarkIndexs, eyes_index, mean_shape, HoGParams, LinearRegressors);
     model.train(mImageLabels);
-    save_ldmarkmodel(model, "PCA-SDM-model.bin");
+    save_sdm(model, "PCA-SDM-model.bin");
 
 
     system("pause");

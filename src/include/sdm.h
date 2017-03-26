@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LDMARKMODEL_H_
-#define LDMARKMODEL_H_
+#ifndef sdm_H_
+#define sdm_H_
 
 #include <iostream>
 #include <vector>
@@ -72,12 +72,12 @@ private:
 };
 
 
-class ldmarkmodel{
+class sdm{
 
 public:
-    ldmarkmodel();
+    sdm();
 
-    ldmarkmodel(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_index, cv::Mat meanShape, std::vector<HoGParam> HoGParams, std::vector<LinearRegressor> LinearRegressors);
+    sdm(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_index, cv::Mat meanShape, std::vector<HoGParam> HoGParams, std::vector<LinearRegressor> LinearRegressors);
 
     void loadFaceDetModelFile(std::string filePath = "haar_roboman_ff_alt2.xml");
 
@@ -126,14 +126,14 @@ private:
 };
 
 //加载模型
-bool load_ldmarkmodel(std::string filename, ldmarkmodel &model);
+bool load_sdm(std::string filename, sdm &model);
 
 //保存模型
-void save_ldmarkmodel(ldmarkmodel model, std::string filename);
+void save_sdm(sdm model, std::string filename);
 
 
 
-#include "ldmarkmodel.cpp"
+#include "sdm.cpp"
 
 #endif
 

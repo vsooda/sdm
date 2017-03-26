@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "ldmarkmodel.h"
+#include "sdm.h"
 
 LinearRegressor::LinearRegressor() : weights(),meanvalue(),x(),isPCA(false)
 {
@@ -131,7 +131,7 @@ void LinearRegressor::convert(std::vector<int> &tar_LandmarkIndex){
     }
 }
 
-ldmarkmodel::ldmarkmodel(){
+sdm::sdm(){
     //{36,39,42,45,30,48,54};   {7,16,17,8,9,10,11};
     static int HeadPosePointIndexs[] = {36,39,42,45,30,48,54};
     estimateHeadPosePointIndexs = HeadPosePointIndexs;
@@ -172,20 +172,20 @@ ldmarkmodel::ldmarkmodel(){
     loadFaceDetModelFile();
 }
 
-ldmarkmodel::ldmarkmodel(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_index, cv::Mat meanShape, std::vector<HoGParam> HoGParams, std::vector<LinearRegressor> LinearRegressors) :
+sdm::sdm(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_index, cv::Mat meanShape, std::vector<HoGParam> HoGParams, std::vector<LinearRegressor> LinearRegressors) :
     LandmarkIndexs(LandmarkIndexs),eyes_index(eyes_index),meanShape(meanShape),HoGParams(HoGParams),isNormal(true),LinearRegressors(LinearRegressors)
 {
     loadFaceDetModelFile();
 }
 
-void ldmarkmodel::loadFaceDetModelFile(std::string filePath){
+void sdm::loadFaceDetModelFile(std::string filePath){
     face_cascade.load(filePath);
     if(face_cascade.empty()){
         std::cout << "人脸检测模型加载失败." << std::endl;
     }
 }
 
-void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
+void sdm::train(std::vector<ImageLabel> &mImageLabels){
     assert(HoGParams.size() >= LinearRegressors.size());
     int samplesNum = 800;    //mImageLabels.size()/10;
     std::cout << "请输入训练样本个数，最少20个." << std::endl;
@@ -330,7 +330,7 @@ void ldmarkmodel::train(std::vector<ImageLabel> &mImageLabels){
 
 
 
-cv::Mat ldmarkmodel::predict(const cv::Mat& src){
+cv::Mat sdm::predict(const cv::Mat& src){
     cv::Mat grayImage;
     if(src.channels() == 1){
         grayImage = src;
@@ -392,7 +392,7 @@ cv::Mat ldmarkmodel::predict(const cv::Mat& src){
 
 
 
-int ldmarkmodel::track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace){
+int sdm::track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace){
     cv::Mat grayImage;
     if(src.channels() == 1){
         grayImage = src;
@@ -458,7 +458,7 @@ int ldmarkmodel::track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFac
     return error_code;
 }
 
-void ldmarkmodel::printmodel(){
+void sdm::printmodel(){
     if(isNormal)
         std::cout << "以两眼距离归一化步长" << std::endl;
     else
@@ -470,7 +470,7 @@ void ldmarkmodel::printmodel(){
     }
 }
 
-void ldmarkmodel::convert(std::vector<int> &full_eyes_Indexs){
+void sdm::convert(std::vector<int> &full_eyes_Indexs){
     std::vector<int> tar_LandmarkIndex;
     for(int i=0; i<LinearRegressors.size(); i++){
         for(int j=0; j<LandmarkIndexs.at(i).size(); j++){
@@ -535,7 +535,7 @@ void ldmarkmodel::convert(std::vector<int> &full_eyes_Indexs){
     }
 }
 
-void ldmarkmodel::EstimateHeadPose(cv::Mat &current_shape, cv::Vec3d &eav){
+void sdm::EstimateHeadPose(cv::Mat &current_shape, cv::Vec3d &eav){
     if(current_shape.empty())
         return;
     static const int samplePdim = 7;
@@ -578,7 +578,7 @@ void ldmarkmodel::EstimateHeadPose(cv::Mat &current_shape, cv::Vec3d &eav){
     return;
 }
 
-cv::Mat ldmarkmodel::EstimateHeadPose(cv::Mat &current_shape){
+cv::Mat sdm::EstimateHeadPose(cv::Mat &current_shape){
     if(current_shape.empty())
         return cv::Mat();
     static const int samplePdim = 7;
@@ -614,7 +614,7 @@ cv::Mat ldmarkmodel::EstimateHeadPose(cv::Mat &current_shape){
     return rot;
 }
 
-void ldmarkmodel::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL)
+void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL)
 {
     if(current_shape.empty())
         return;
@@ -706,7 +706,7 @@ void ldmarkmodel::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lin
 //        Roll  = eav[2];
 }
 //加载模型
-bool load_ldmarkmodel(std::string filename, ldmarkmodel &model)
+bool load_sdm(std::string filename, sdm &model)
 {
     std::ifstream file(filename, std::ios::binary);
     if(!file.is_open())
@@ -718,7 +718,7 @@ bool load_ldmarkmodel(std::string filename, ldmarkmodel &model)
 }
 
 //保存模型
-void save_ldmarkmodel(ldmarkmodel model, std::string filename)
+void save_sdm(sdm model, std::string filename)
 {
     std::ofstream file(filename, std::ios::binary);
     cereal::BinaryOutputArchive output_archive(file);

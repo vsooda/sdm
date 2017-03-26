@@ -8,7 +8,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 
-#include "ldmarkmodel.h"
+#include "sdm.h"
 
 using namespace std;
 using namespace cv;
@@ -26,9 +26,9 @@ int main()
     std::cout << "测试数据一共有: " <<  mImageLabels.size() << std::endl;
 	*******************/
 
-    ldmarkmodel modelt;
+    sdm modelt;
     std::string modelFilePath = "roboman-landmark-model.bin";
-    while(!load_ldmarkmodel(modelFilePath, modelt)){
+    while(!load_sdm(modelFilePath, modelt)){
         std::cout << "文件打开错误，请重新输入文件路径." << std::endl;
         std::cin >> modelFilePath;
     }
@@ -43,7 +43,9 @@ int main()
     cv::Mat current_shape;
     for(;;){
         mCamera >> Image;
+        clock_t a = clock();
         modelt.track(Image, current_shape);
+        std::cout << (clock() - a) * 1000.0 / CLOCKS_PER_SEC << std::endl;
         cv::Vec3d eav;
         modelt.EstimateHeadPose(current_shape, eav);
         modelt.drawPose(Image, current_shape, 50);
