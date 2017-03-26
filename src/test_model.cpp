@@ -75,16 +75,6 @@ std::string getFileString(const std::string& filepath) {
 
 int main()
 {
-	/*********************
-    std::vector<ImageLabel> mImageLabels;
-    if(!load_ImageLabels("mImageLabels-test.bin", mImageLabels)){
-        mImageLabels.clear();
-        ReadLabelsFromFile(mImageLabels, "labels_ibug_300W_test.xml");
-        save_ImageLabels(mImageLabels, "mImageLabels-test.bin");
-    }
-    std::cout << "测试数据一共有: " <<  mImageLabels.size() << std::endl;
-	*******************/
-
     cv::CascadeClassifier face_cascade;
     std::string faceModel("haar_roboman_ff_alt2.xml");
     face_cascade.load(faceModel);

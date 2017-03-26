@@ -217,24 +217,6 @@ void sdm::train(std::vector<ImageLabel> &mImageLabels){
         for(int j=0; j<meanShape.cols; j++){
             current_shape.at<float>(i, j) = align_shape.at<float>(j);
         }
-
-//            int numLandmarks = meanShape.cols/2;
-//            for(int j=0; j<numLandmarks; j++){
-//                int x = current_shape.at<float>(i, j);
-//                int y = current_shape.at<float>(i, j + numLandmarks);
-//                cv::circle(Image, cv::Point(x, y), 5, cv::Scalar(255, 0, 0), -1);
-//                x = target_shape.at<float>(i, j);
-//                y = target_shape.at<float>(i, j + numLandmarks);
-//                cv::circle(Image, cv::Point(x, y), 3, cv::Scalar(0, 0, 255), -1);
-//            }
-//            cv::rectangle(Image,  faceBox, cv::Scalar(0, 255, 0), 1, 4);
-//            cv::rectangle(Image, mfaceBox, cv::Scalar(255, 0, 0), 3);
-//            cv::rectangle(Image, efaceBox, cv::Scalar(0, 0, 255), 1, 4);
-//            cv::imshow("Image", Image);
-//            std::cout << (float)(efaceBox & faceBox).area()/faceBox.area() << std::endl;
-//            if((float)(efaceBox & faceBox).area()/faceBox.area()<0.4)
-//                cv::waitKey(0);
-//            cv::waitKey(10);
     }
     float error0 = 0.0f;
     int numLandmarks = target_shape.cols/2;
@@ -550,26 +532,6 @@ void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, cv::Vec3d pose, f
     line(img, p0, cv::Point(P.at<float>(0,1),P.at<float>(1,1)), cv::Scalar( 255, 0, 0 ), thickness, lineType);
     line(img, p0, cv::Point(P.at<float>(0,2),P.at<float>(1,2)), cv::Scalar( 0, 255, 0 ), thickness, lineType);
     line(img, p0, cv::Point(P.at<float>(0,3),P.at<float>(1,3)), cv::Scalar( 0, 0, 255 ), thickness, lineType);
-
-    //use opencv to predict pose
-    //cv::Vec3d eav;
-    //cv::Mat tmp0,tmp1,tmp2,tmp3,tmp4,tmp5;
-    //double _pm[12] = {rot.at<float>(0, 0), rot.at<float>(0, 1),rot.at<float>(0, 2), 0,
-    //                  rot.at<float>(1, 0), rot.at<float>(1, 1),rot.at<float>(1, 2),0,
-    //                  rot.at<float>(2, 0), rot.at<float>(2, 1),rot.at<float>(2, 2),0};
-    //cv::decomposeProjectionMatrix(cv::Mat(3,4,CV_64FC1,_pm),tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,eav);
-    //std::stringstream ss;
-    //ss << eav[0];
-    //txt = "Pitch: " + ss.str();
-    //cv::putText(img, txt,  cv::Point(60, 20), 0.5,0.5, cv::Scalar(0,0,255));
-    //std::stringstream ss1;
-    //ss1 << eav[1];
-    //txt1 = "Yaw: " + ss1.str();
-    //cv::putText(img, txt1, cv::Point(60, 40), 0.5,0.5, cv::Scalar(0,0,255));
-    //std::stringstream ss2;
-    //ss2 << eav[2];
-    //txt2 = "Roll: " + ss2.str();
-    //cv::putText(img, txt2, cv::Point(60, 60), 0.5,0.5, cv::Scalar(0,0,255));
 }
 
 //加载模型
