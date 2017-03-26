@@ -85,33 +85,35 @@ public:
 
     cv::Mat predict(const cv::Mat& src);
 
-    int  track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace=false);
+    int track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace=false);
 
     void printmodel();
 
     void convert(std::vector<int> &full_eyes_Indexs);
 
-    cv::Mat EstimateHeadPose(cv::Mat &current_shape);
+    cv::Vec3d EstimateHeadPose(cv::Mat &current_shape);
 
-    void  EstimateHeadPose(cv::Mat &current_shape, cv::Vec3d &eav);
+    void drawPose(cv::Mat& img, const cv::Mat& current_shape, cv::Vec3d pose, float lineL=50);
 
-    void drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL=50);
+    float getPitch();
+    float getRoll();
+    float getYaw();
+
 private:
     cv::Rect faceBox;
-
-
     std::vector<std::vector<int>> LandmarkIndexs;
     std::vector<int> eyes_index;
     cv::Mat meanShape;
+    float pitch_;
+    float yaw_;
+    float roll_;
     std::vector<HoGParam> HoGParams;
     bool isNormal;
     std::vector<LinearRegressor> LinearRegressors;
     cv::CascadeClassifier face_cascade;
-
     cv::Mat estimateHeadPoseMat;
     cv::Mat estimateHeadPoseMat2;
     int *estimateHeadPosePointIndexs;
-
     friend class cereal::access;
     /**
      * Serialises this class using cereal.

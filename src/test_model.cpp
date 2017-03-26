@@ -73,9 +73,8 @@ int main()
         clock_t a = clock();
         modelt.track(Image, current_shape);
         std::cout << (clock() - a) * 1000.0 / CLOCKS_PER_SEC << std::endl;
-        cv::Vec3d eav;
-        modelt.EstimateHeadPose(current_shape, eav);
-        modelt.drawPose(Image, current_shape, 50);
+        cv::Vec3d eav = modelt.EstimateHeadPose(current_shape);
+        modelt.drawPose(Image, current_shape, eav, 50);
 
         int numLandmarks = current_shape.cols/2;
         for(int j=0; j<numLandmarks; j++){

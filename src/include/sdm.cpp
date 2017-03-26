@@ -533,9 +533,9 @@ void sdm::convert(std::vector<int> &full_eyes_Indexs){
     }
 }
 
-void sdm::EstimateHeadPose(cv::Mat &current_shape, cv::Vec3d &eav){
+cv::Vec3d sdm::EstimateHeadPose(cv::Mat &current_shape) {
     if(current_shape.empty())
-        return;
+        return cv::Vec3d(0, 0, 0);
     static const int samplePdim = 7;
     float miny = 10000000000.0f;
     float maxy = 0.0f;
@@ -559,63 +559,48 @@ void sdm::EstimateHeadPose(cv::Mat &current_shape, cv::Vec3d &eav){
         tmp.at<float>(i+samplePdim) = (current_shape.at<float>(estimateHeadPosePointIndexs[i]+current_shape.cols/2)-sumy)/dist;
     }
     tmp.at<float>(2*samplePdim) = 1.0f;
-//    cv::Mat predict = tmp*estimateHeadPoseMat;
-//    double _pm[12] = {predict.at<float>(0), predict.at<float>(1), predict.at<float>(2), 0,
-//                      predict.at<float>(3), predict.at<float>(4), predict.at<float>(5), 0,
-//                      predict.at<float>(6), predict.at<float>(7), predict.at<float>(8), 0};
-//    cv::Mat tmp0,tmp1,tmp2,tmp3,tmp4,tmp5;
-//    cv::decomposeProjectionMatrix(cv::Mat(3,4,CV_64FC1,_pm),tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,eav);
     cv::Mat predict = tmp*estimateHeadPoseMat2;
+    cv::Vec3d eav;
     eav[0] = predict.at<float>(0);
     eav[1] = predict.at<float>(1);
     eav[2] = predict.at<float>(2);
-//    std::cout << eav[0] << "  " << eav[1] << "  " << eav[2] << std::endl;
-//    Pitch = eav[0];
-//    Yaw	= eav[1];
-//    Roll  = eav[2];
-    return;
+    pitch_ = eav[0];
+    yaw_ = eav[1];
+    roll_ = eav[2];
+    return eav;
 }
 
-cv::Mat sdm::EstimateHeadPose(cv::Mat &current_shape){
-    if(current_shape.empty())
-        return cv::Mat();
-    static const int samplePdim = 7;
-    float miny = 10000000000.0f;
-    float maxy = 0.0f;
-    float sumx = 0.0f;
-    float sumy = 0.0f;
-    for(int i=0; i<samplePdim; i++){
-        sumx += current_shape.at<float>(estimateHeadPosePointIndexs[i]);
-        float y = current_shape.at<float>(estimateHeadPosePointIndexs[i]+current_shape.cols/2);
-        sumy += y;
-        if(miny > y)
-            miny = y;
-        if(maxy < y)
-            maxy = y;
-    }
-    float dist = maxy - miny;
-    sumx = sumx/samplePdim;
-    sumy = sumy/samplePdim;
-    static cv::Mat tmp(1, 2*samplePdim+1, CV_32FC1);
-    for(int i=0; i<samplePdim; i++){
-        tmp.at<float>(i) = (current_shape.at<float>(estimateHeadPosePointIndexs[i])-sumx)/dist;
-        tmp.at<float>(i+samplePdim) = (current_shape.at<float>(estimateHeadPosePointIndexs[i]+current_shape.cols/2)-sumy)/dist;
-    }
-    tmp.at<float>(2*samplePdim) = 1.0f;
-    cv::Mat predict = tmp*estimateHeadPoseMat;
-    cv::Mat rot(3,3,CV_32FC1);
-    for(int i=0; i<3; i++){
-        rot.at<float>(i,0) = predict.at<float>(3*i);
-        rot.at<float>(i,1) = predict.at<float>(3*i+1);
-        rot.at<float>(i,2) = predict.at<float>(3*i+2);
-    }
-    return rot;
+float sdm::getPitch() {
+    return pitch_;
 }
 
-void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL)
+float sdm::getYaw() {
+    return yaw_;
+}
+
+float sdm::getRoll() {
+    return roll_;
+}
+
+void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, cv::Vec3d pose, float lineL)
 {
     if(current_shape.empty())
         return;
+
+    std::string txt, txt1, txt2;
+    std::stringstream ss3;
+    ss3 << pose[0];
+    txt = "Pitch: " + ss3.str();
+    cv::putText(img, txt,  cv::Point(340, 20), 0.5,0.5, cv::Scalar(255,255,255));
+    std::stringstream ss4;
+    ss4 << pose[1];
+    txt1 = "Yaw: " + ss4.str();
+    cv::putText(img, txt1, cv::Point(340, 40), 0.5,0.5, cv::Scalar(255,255,255));
+    std::stringstream ss5;
+    ss5 << pose[2];
+    txt2 = "Roll: " + ss5.str();
+    cv::putText(img, txt2, cv::Point(340, 60), 0.5,0.5, cv::Scalar(255,255,255));
+
     static const int samplePdim = 7;
     float miny = 10000000000.0f;
     float maxy = 0.0f;
@@ -664,45 +649,27 @@ void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL)
     line(img, p0, cv::Point(P.at<float>(0,2),P.at<float>(1,2)), cv::Scalar( 0, 255, 0 ), thickness, lineType);
     line(img, p0, cv::Point(P.at<float>(0,3),P.at<float>(1,3)), cv::Scalar( 0, 0, 255 ), thickness, lineType);
 
-    //printf("%f %f %f\n", rot.at<float>(0, 0), rot.at<float>(0, 1), rot.at<float>(0, 2));
-    //printf("%f %f %f\n", rot.at<float>(1, 0), rot.at<float>(1, 1), rot.at<float>(1, 2));
-
-    cv::Vec3d eav;
-    cv::Mat tmp0,tmp1,tmp2,tmp3,tmp4,tmp5;
-    double _pm[12] = {rot.at<float>(0, 0), rot.at<float>(0, 1),rot.at<float>(0, 2), 0,
-                      rot.at<float>(1, 0), rot.at<float>(1, 1),rot.at<float>(1, 2),0,
-                      rot.at<float>(2, 0), rot.at<float>(2, 1),rot.at<float>(2, 2),0};
-    cv::decomposeProjectionMatrix(cv::Mat(3,4,CV_64FC1,_pm),tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,eav);
-    std::stringstream ss;
-    ss << eav[0];
-    std::string txt = "Pitch: " + ss.str();
-    cv::putText(img, txt,  cv::Point(60, 20), 0.5,0.5, cv::Scalar(0,0,255));
-    std::stringstream ss1;
-    ss1 << eav[1];
-    std::string txt1 = "Yaw: " + ss1.str();
-    cv::putText(img, txt1, cv::Point(60, 40), 0.5,0.5, cv::Scalar(0,0,255));
-    std::stringstream ss2;
-    ss2 << eav[2];
-    std::string txt2 = "Roll: " + ss2.str();
-    cv::putText(img, txt2, cv::Point(60, 60), 0.5,0.5, cv::Scalar(0,0,255));
-
-    predict = tmp*estimateHeadPoseMat2;
-    std::stringstream ss3;
-    ss3 << predict.at<float>(0);
-    txt = "Pitch: " + ss3.str();
-    cv::putText(img, txt,  cv::Point(340, 20), 0.5,0.5, cv::Scalar(255,255,255));
-    std::stringstream ss4;
-    ss4 << predict.at<float>(1);
-    txt1 = "Yaw: " + ss4.str();
-    cv::putText(img, txt1, cv::Point(340, 40), 0.5,0.5, cv::Scalar(255,255,255));
-    std::stringstream ss5;
-    ss5 << predict.at<float>(2);
-    txt2 = "Roll: " + ss5.str();
-    cv::putText(img, txt2, cv::Point(340, 60), 0.5,0.5, cv::Scalar(255,255,255));
-//        Pitch = eav[0];
-//        Yaw	  = eav[1];
-//        Roll  = eav[2];
+    //use opencv to predict pose
+    //cv::Vec3d eav;
+    //cv::Mat tmp0,tmp1,tmp2,tmp3,tmp4,tmp5;
+    //double _pm[12] = {rot.at<float>(0, 0), rot.at<float>(0, 1),rot.at<float>(0, 2), 0,
+    //                  rot.at<float>(1, 0), rot.at<float>(1, 1),rot.at<float>(1, 2),0,
+    //                  rot.at<float>(2, 0), rot.at<float>(2, 1),rot.at<float>(2, 2),0};
+    //cv::decomposeProjectionMatrix(cv::Mat(3,4,CV_64FC1,_pm),tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,eav);
+    //std::stringstream ss;
+    //ss << eav[0];
+    //txt = "Pitch: " + ss.str();
+    //cv::putText(img, txt,  cv::Point(60, 20), 0.5,0.5, cv::Scalar(0,0,255));
+    //std::stringstream ss1;
+    //ss1 << eav[1];
+    //txt1 = "Yaw: " + ss1.str();
+    //cv::putText(img, txt1, cv::Point(60, 40), 0.5,0.5, cv::Scalar(0,0,255));
+    //std::stringstream ss2;
+    //ss2 << eav[2];
+    //txt2 = "Roll: " + ss2.str();
+    //cv::putText(img, txt2, cv::Point(60, 60), 0.5,0.5, cv::Scalar(0,0,255));
 }
+
 //加载模型
 bool load_sdm(const std::string& modelString, sdm &model)
 {
