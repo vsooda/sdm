@@ -14,6 +14,32 @@ using namespace std;
 using namespace cv;
 
 
+std::string getFileString(const std::string& filepath) {
+	std::ifstream is(filepath);
+	std::string filebuffer="";
+	if (is.is_open()) {
+		// get length of file:
+		is.seekg (0, is.end);
+		long long length = is.tellg();
+		is.seekg (0, is.beg);
+		char * buffer = new char [length];
+		std::cout << "Reading " << filepath << " " << length << " characters... ";
+		// read data as a block:
+		is.read (buffer,length);
+		if (is)
+			std::cout << "all characters read successfully." << std::endl;
+		else
+			std::cout << "error: only " << is.gcount() << " could be read";
+		is.close();
+		// ...buffer contains the entire file...
+		filebuffer = std::string(buffer,length);
+		delete[] buffer;
+	} else {
+		std::cout << filepath << "open faild in getFileString" << std::endl;
+	}
+	return filebuffer;
+}
+
 int main()
 {
 	/*********************
@@ -28,7 +54,8 @@ int main()
 
     sdm modelt;
     std::string modelFilePath = "roboman-landmark-model.bin";
-    while(!load_sdm(modelFilePath, modelt)){
+    std::string modelString = getFileString(modelFilePath);
+    while(!load_sdm(modelString, modelt)){
         std::cout << "文件打开错误，请重新输入文件路径." << std::endl;
         std::cin >> modelFilePath;
     }

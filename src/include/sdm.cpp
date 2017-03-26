@@ -2,6 +2,7 @@
 
 
 #include "sdm.h"
+#include <sstream>
 
 LinearRegressor::LinearRegressor() : weights(),meanvalue(),x(),isPCA(false)
 {
@@ -706,14 +707,12 @@ void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL)
 //        Roll  = eav[2];
 }
 //加载模型
-bool load_sdm(std::string filename, sdm &model)
+bool load_sdm(std::string modelString, sdm &model)
 {
-    std::ifstream file(filename, std::ios::binary);
-    if(!file.is_open())
-        return false;
-    cereal::BinaryInputArchive input_archive(file);
+    std::cout << "load from string" << std::endl;
+    std::istringstream model_sin(modelString);
+    cereal::BinaryInputArchive input_archive(model_sin);
     input_archive(model);
-    file.close();
     return true;
 }
 
