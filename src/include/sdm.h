@@ -126,7 +126,7 @@ private:
 };
 
 //加载模型
-bool load_sdm(std::string filename, sdm &model);
+bool load_sdm(const std::string& modelString, sdm &model);
 
 //保存模型
 void save_sdm(sdm model, std::string filename);

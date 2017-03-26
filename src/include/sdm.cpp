@@ -707,7 +707,7 @@ void sdm::drawPose(cv::Mat& img, const cv::Mat& current_shape, float lineL)
 //        Roll  = eav[2];
 }
 //加载模型
-bool load_sdm(std::string modelString, sdm &model)
+bool load_sdm(const std::string& modelString, sdm &model)
 {
     std::cout << "load from string" << std::endl;
     std::istringstream model_sin(modelString);
