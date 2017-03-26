@@ -79,13 +79,10 @@ public:
 
     sdm(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_index, cv::Mat meanShape, std::vector<HoGParam> HoGParams, std::vector<LinearRegressor> LinearRegressors);
 
-    void loadFaceDetModelFile(std::string filePath = "haar_roboman_ff_alt2.xml");
 
     void train(std::vector<ImageLabel> &mImageLabels);
 
-    cv::Mat predict(const cv::Mat& src);
-
-    int track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace=false);
+    int detectPoint(const cv::Mat& src, cv::Mat& current_shape, cv::Rect faceBox);
 
     void printmodel();
 
@@ -110,7 +107,6 @@ private:
     std::vector<HoGParam> HoGParams;
     bool isNormal;
     std::vector<LinearRegressor> LinearRegressors;
-    cv::CascadeClassifier face_cascade;
     cv::Mat estimateHeadPoseMat;
     cv::Mat estimateHeadPoseMat2;
     int *estimateHeadPosePointIndexs;

@@ -167,21 +167,13 @@ sdm::sdm(){
         -4.74948,-3.79454,12.7986,
         -16.1,1.47175,4.03941 };
     estimateHeadPoseMat2 = cv::Mat(15,3,CV_32FC1,estimateHeadPose2dArray2);
-    loadFaceDetModelFile();
 }
 
 sdm::sdm(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_index, cv::Mat meanShape, std::vector<HoGParam> HoGParams, std::vector<LinearRegressor> LinearRegressors) :
     LandmarkIndexs(LandmarkIndexs),eyes_index(eyes_index),meanShape(meanShape),HoGParams(HoGParams),isNormal(true),LinearRegressors(LinearRegressors)
 {
-    loadFaceDetModelFile();
 }
 
-void sdm::loadFaceDetModelFile(std::string filePath){
-    face_cascade.load(filePath);
-    if(face_cascade.empty()){
-        std::cout << "人脸检测模型加载失败." << std::endl;
-    }
-}
 
 void sdm::train(std::vector<ImageLabel> &mImageLabels){
     assert(HoGParams.size() >= LinearRegressors.size());
@@ -326,9 +318,7 @@ void sdm::train(std::vector<ImageLabel> &mImageLabels){
     }
 }
 
-
-
-cv::Mat sdm::predict(const cv::Mat& src){
+int sdm::detectPoint(const cv::Mat& src, cv::Mat& current_shape, cv::Rect faceBox){
     cv::Mat grayImage;
     if(src.channels() == 1){
         grayImage = src;
@@ -336,108 +326,8 @@ cv::Mat sdm::predict(const cv::Mat& src){
         cv::cvtColor(src, grayImage, CV_BGR2GRAY);
     }else if(src.channels() == 4){
         cv::cvtColor(src, grayImage, CV_RGBA2GRAY);
-    }else{
-        return cv::Mat();
     }
 
-    std::vector<cv::Rect> mFaceRects;
-    face_cascade.detectMultiScale(grayImage, mFaceRects, 1.2, 2, 0, cv::Size(50, 50));
-    if(mFaceRects.size() <=0)
-        return cv::Mat();
-    cv::Rect maxRect = mFaceRects[0];
-    for(int i=1; i<mFaceRects.size(); i++){
-        if(maxRect.area() < mFaceRects[i].area())
-            maxRect = mFaceRects[i];
-    }
-    cv::Mat current_shape = align_mean(meanShape, maxRect);        //perturb(maxRect)
-    int numLandmarks = current_shape.cols/2;
-
-    cv::Mat drawImage = src.clone();
-    for(int j=0; j<numLandmarks; j++){
-        int x = current_shape.at<float>(j);
-        int y = current_shape.at<float>(j + numLandmarks);
-        cv::circle(drawImage, cv::Point(x, y), 3, cv::Scalar(255, 0, 0), -1);
-    }
-    cv::imshow("drawImage", drawImage);
-    cv::waitKey(0);
-
-
-    for(int i=0; i<LinearRegressors.size(); i++){
-        cv::Mat Descriptor = CalculateHogDescriptor(grayImage, current_shape, LandmarkIndexs.at(i), eyes_index, HoGParams.at(i));
-        cv::Mat update_step = LinearRegressors.at(i).predict(Descriptor);
-        if(isNormal){
-            float lx = ( current_shape.at<float>(eyes_index.at(0))+current_shape.at<float>(eyes_index.at(1)) )*0.5;
-            float ly = ( current_shape.at<float>(eyes_index.at(0)+numLandmarks)+current_shape.at<float>(eyes_index.at(1)+numLandmarks) )*0.5;
-            float rx = ( current_shape.at<float>(eyes_index.at(2))+current_shape.at<float>(eyes_index.at(3)) )*0.5;
-            float ry = ( current_shape.at<float>(eyes_index.at(2)+numLandmarks)+current_shape.at<float>(eyes_index.at(3)+numLandmarks) )*0.5;
-            float distance = sqrt( (rx-lx)*(rx-lx)+(ry-ly)*(ry-ly) );
-            update_step = update_step*distance;
-        }
-        current_shape = current_shape + update_step;
-
-        drawImage.release();
-        drawImage = src.clone();
-        for(int j=0; j<numLandmarks; j++){
-            int x = current_shape.at<float>(j);
-            int y = current_shape.at<float>(j + numLandmarks);
-            cv::circle(drawImage, cv::Point(x, y), 3, cv::Scalar(255, 0, 0), -1);
-        }
-        cv::imshow("drawImage", drawImage);
-        cv::waitKey(0);
-    }
-    return current_shape;
-}
-
-
-
-int sdm::track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace){
-    cv::Mat grayImage;
-    if(src.channels() == 1){
-        grayImage = src;
-    }else if(src.channels() == 3){
-        cv::cvtColor(src, grayImage, CV_BGR2GRAY);
-    }else if(src.channels() == 4){
-        cv::cvtColor(src, grayImage, CV_RGBA2GRAY);
-    }else{
-        return SDM_ERROR_IMAGE;
-    }
-
-    if(!current_shape.empty()){
-        faceBox = get_enclosing_bbox(current_shape);
-    }else{
-        faceBox = cv::Rect(0,0,0,0);
-    }
-    int error_code = SDM_NO_ERROR;
-    cv::Rect mfaceBox = faceBox & cv::Rect(0, 0, grayImage.cols, grayImage.rows);
-    float ratio = ((float)faceBox.width)/faceBox.height;
-//    if(isDetFace || faceBox.area()<10000 || ratio>1.45f || ratio<0.8f || ((float)mfaceBox.area())/faceBox.area()<0.85f){
-//        std::vector<cv::Rect> mFaceRects;
-//        face_cascade.detectMultiScale(grayImage, mFaceRects, 1.3, 3, 0, cv::Size(100, 100));
-//        if(mFaceRects.size() <=0){
-//            current_shape = cv::Mat();
-//            return SDM_ERROR_FACENO;
-//        }
-//        faceBox = mFaceRects[0];
-//        for(int i=1; i<mFaceRects.size(); i++){
-//            if(faceBox.area() < mFaceRects[i].area())
-//                faceBox = mFaceRects[i];
-//        }
-//        error_code = SDM_ERROR_FACEDET;
-//    }
-    if(isDetFace || faceBox.area()<100){
-        std::vector<cv::Rect> mFaceRects;
-        face_cascade.detectMultiScale(grayImage, mFaceRects, 1.3, 3, 0, cv::Size(100, 100));
-        if(mFaceRects.size() <=0){
-            current_shape = cv::Mat();
-            return SDM_ERROR_FACENO;
-        }
-        faceBox = mFaceRects[0];
-        for(int i=1; i<mFaceRects.size(); i++){
-            if(faceBox.area() < mFaceRects[i].area())
-                faceBox = mFaceRects[i];
-        }
-        error_code = SDM_ERROR_FACEDET;
-    }
     current_shape = align_mean(meanShape, faceBox);
     int numLandmarks = current_shape.cols/2;
     for(int i=0; i<LinearRegressors.size(); i++){
@@ -453,7 +343,7 @@ int sdm::track(const cv::Mat& src, cv::Mat& current_shape, bool isDetFace){
         }
         current_shape = current_shape + update_step;
     }
-    return error_code;
+    return 0;
 }
 
 void sdm::printmodel(){
