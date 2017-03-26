@@ -131,10 +131,6 @@ bool load_sdm(const std::string& modelString, sdm &model);
 //保存模型
 void save_sdm(sdm model, std::string filename);
 
-
-
-#include "sdm.cpp"
-
 #endif
 
 

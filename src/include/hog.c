@@ -13,7 +13,6 @@
 
 //#include "hog.h"
 //#include "mathop.h"
-#pragma once
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>

@@ -1,6 +1,3 @@
-#pragma once
-
-
 #include "sdm.h"
 #include <sstream>
 

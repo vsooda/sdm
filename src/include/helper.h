@@ -71,7 +71,7 @@ static cv::Rect_<T> get_enclosing_bbox(cv::Mat landmarks)
  * @param[in] translation_y Optional translation in y of the model.
  * @return A cv::Mat of the aligned points.
  */
-cv::Mat align_mean(cv::Mat mean, cv::Rect facebox, float scaling_x=1.0f, float scaling_y=1.0f, float translation_x=0.0f, float translation_y=0.0f)
+inline cv::Mat align_mean(cv::Mat mean, cv::Rect facebox, float scaling_x=1.0f, float scaling_y=1.0f, float translation_x=0.0f, float translation_y=0.0f)
 {
     using cv::Mat;
     // Initial estimate x_0: Center the mean face at the [-0.5, 0.5] x [-0.5, 0.5] square (assuming the face-box is that square)
@@ -86,7 +86,7 @@ cv::Mat align_mean(cv::Mat mean, cv::Rect facebox, float scaling_x=1.0f, float s
 }
 
 
-cv::Mat align_mean(cv::Mat mean, cv::Mat landmarks)
+inline cv::Mat align_mean(cv::Mat mean, cv::Mat landmarks)
 {
     using cv::Mat;
 
@@ -137,7 +137,7 @@ cv::Mat align_mean(cv::Mat mean, cv::Mat landmarks)
  * @param[in] scaling Optional scale factor of the box.
  * @return A perturbed cv::Rect.
  */
-cv::Rect perturb(cv::Rect facebox)
+inline cv::Rect perturb(cv::Rect facebox)
 {
     float translation_x = (rand()%20-10)*0.01;
     float translation_y = (rand()%20-10)*0.01;
@@ -161,7 +161,7 @@ cv::Rect perturb(cv::Rect facebox)
 
 
 
-std::string trim(const std::string& str)
+inline std::string trim(const std::string& str)
 {
     std::string::size_type pos = str.find_first_not_of(' ');
     if (pos == std::string::npos)
@@ -176,7 +176,7 @@ std::string trim(const std::string& str)
     return str.substr(pos);
 }
 
-std::string replace(const std::string& str, const std::string& dest, const std::string& src)
+inline std::string replace(const std::string& str, const std::string& dest, const std::string& src)
 {
     std::string ret = str;
     size_t pos = ret.find(dest);
@@ -187,7 +187,7 @@ std::string replace(const std::string& str, const std::string& dest, const std::
     return ret;
 }
 
-std::vector<std::string> split(const  std::string& s, const std::string& delim)
+inline std::vector<std::string> split(const  std::string& s, const std::string& delim)
 {
     std::vector<std::string> elems;
     size_t pos = 0;
@@ -208,7 +208,7 @@ std::vector<std::string> split(const  std::string& s, const std::string& delim)
     return elems;
 }
 
-void ReadLabelsFromFile(std::vector<ImageLabel> &Imagelabels, std::string Path = "labels_ibug_300W_train.xml"){
+inline void ReadLabelsFromFile(std::vector<ImageLabel> &Imagelabels, std::string Path = "labels_ibug_300W_train.xml"){
     std::string ParentPath(trainFilePath);
     std::ifstream LabelsFile(ParentPath+Path, std::ios::in);
     if(!LabelsFile.is_open())
@@ -265,7 +265,7 @@ void ReadLabelsFromFile(std::vector<ImageLabel> &Imagelabels, std::string Path =
 
 
 //º”‘ÿÕºœÒ±Í«©
-bool load_ImageLabels(std::string filename, std::vector<ImageLabel> &mImageLabels)
+inline bool load_ImageLabels(std::string filename, std::vector<ImageLabel> &mImageLabels)
 {
     std::ifstream file(filename, std::ios::binary);
     if(!file.is_open())
@@ -276,7 +276,7 @@ bool load_ImageLabels(std::string filename, std::vector<ImageLabel> &mImageLabel
 };
 
 //±£¥ÊÕºœÒ±Í«©
-void save_ImageLabels(std::vector<ImageLabel> mImageLabels, std::string filename)
+inline void save_ImageLabels(std::vector<ImageLabel> mImageLabels, std::string filename)
 {
     std::ofstream file(filename, std::ios::binary);
     cereal::BinaryOutputArchive output_archive(file);

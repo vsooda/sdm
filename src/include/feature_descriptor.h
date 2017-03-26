@@ -37,7 +37,7 @@ private:
 };
 
 
-cv::Mat CalculateHogDescriptor(cv::Mat &src, cv::Mat shape, std::vector<int> LandmarkIndexs, std::vector<int> eyes_index, HoGParam mHoGParam){
+inline cv::Mat CalculateHogDescriptor(cv::Mat &src, cv::Mat shape, std::vector<int> LandmarkIndexs, std::vector<int> eyes_index, HoGParam mHoGParam){
     assert(shape.rows==1 && eyes_index.size()==4);
 
     cv::Mat grayImage;
