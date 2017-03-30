@@ -131,7 +131,8 @@ void LinearRegressor::convert(std::vector<int> &tar_LandmarkIndex){
 
 sdm::sdm(){
     //{36,39,42,45,30,48,54};   {7,16,17,8,9,10,11};
-    static int HeadPosePointIndexs[] = {36,39,42,45,30,48,54};
+    //static int HeadPosePointIndexs[] = {36,39,42,45,30,48,54};
+    static int HeadPosePointIndexs[] = {27, 29, 33, 31, 65, 46, 52};
     estimateHeadPosePointIndexs = HeadPosePointIndexs;
     static float estimateHeadPose2dArray[] = {
         -0.208764,-0.140359,0.458815,0.106082,0.00859783,-0.0866249,-0.443304,-0.00551231,-0.0697294,
@@ -177,27 +178,14 @@ sdm::sdm(std::vector<std::vector<int>> LandmarkIndexs, std::vector<int> eyes_ind
 
 void sdm::train(std::vector<ImageLabel> &mImageLabels){
     assert(HoGParams.size() >= LinearRegressors.size());
-    int samplesNum = 800;    //mImageLabels.size()/10;
-    std::cout << "请输入训练样本个数，最少20个." << std::endl;
-    std::cin >> samplesNum;
-    if(samplesNum < 20)
-        samplesNum = 20;
-    else if(samplesNum > mImageLabels.size())
-        samplesNum = mImageLabels.size();
+    int samplesNum = mImageLabels.size();
     std::cout << "一共" << samplesNum << "个训练样本.\n" << std::endl;
 
-    std::cout << "是否以两眼距离标准归一化Landmarker坐标偏差?\n[Y/N?]" << std::endl;
-    std::string t;
-    std::cin >> t;
-    if(t=="Y" || t=="y")
-        isNormal = true;
-    else if(t=="N" || t=="n")
-        isNormal = false;
+    isNormal = true;
     if(isNormal)
         std::cout << "归一化坐标.\n" << std::endl;
     else
         std::cout << "不归一化坐标.\n" << std::endl;
-
 
     cv::Mat current_shape(samplesNum, meanShape.cols, CV_32FC1);
     cv::Mat target_shape(samplesNum, meanShape.cols, CV_32FC1);
@@ -212,7 +200,7 @@ void sdm::train(std::vector<ImageLabel> &mImageLabels){
         cv::Rect mfaceBox = perturb(faceBox) & cv::Rect(0,0,Image.cols, Image.rows);
         if((float)(efaceBox & faceBox).area()/faceBox.area()<0.4)
             mfaceBox = perturb(efaceBox) & cv::Rect(0,0,Image.cols, Image.rows);
-        cv::Mat  align_shape = align_mean(meanShape, mfaceBox);
+        cv::Mat  align_shape = align_self_mean(meanShape, mfaceBox);
         assert(align_shape.rows == 1);
         for(int j=0; j<meanShape.cols; j++){
             current_shape.at<float>(i, j) = align_shape.at<float>(j);
@@ -310,7 +298,7 @@ int sdm::detectPoint(const cv::Mat& src, cv::Mat& current_shape, cv::Rect faceBo
         cv::cvtColor(src, grayImage, CV_RGBA2GRAY);
     }
 
-    current_shape = align_mean(meanShape, faceBox);
+    current_shape = align_self_mean(meanShape, faceBox);
     int numLandmarks = current_shape.cols/2;
     for(int i=0; i<LinearRegressors.size(); i++){
         cv::Mat Descriptor = CalculateHogDescriptor(grayImage, current_shape, LandmarkIndexs.at(i), eyes_index, HoGParams.at(i));

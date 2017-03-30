@@ -73,7 +73,7 @@ std::string getFileString(const std::string& filepath) {
 	return filebuffer;
 }
 
-int main()
+int main(int argc, char** argv)
 {
     cv::CascadeClassifier face_cascade;
     std::string faceModel("haar_roboman_ff_alt2.xml");
@@ -83,17 +83,45 @@ int main()
     }
 
     sdm modelt;
-    std::string modelFilePath = "roboman-landmark-model.bin";
+    std::string modelFilePath = "self_sdm_model.bin";
     std::string modelString = getFileString(modelFilePath);
     while(!load_sdm(modelString, modelt)){
         std::cout << "文件打开错误，请重新输入文件路径." << std::endl;
         std::cin >> modelFilePath;
     }
 
+    bool testVideo = false;
+
+    if (!testVideo) {
+        //测试单张图片
+        for (int index = 4; index < argc; index++) {
+            //Mat image = cv::imread("examples/data/ibug_lfpw_trainset/image_0005.png");
+			std::string filename(argv[index]);
+			std::cout << filename << std::endl;
+            cv::Mat image = cv::imread(filename);
+            cv::Mat current_shape;
+            vector<cv::Rect> detected_faces;
+            face_cascade.detectMultiScale(image, detected_faces, 1.2, 2, 0, cv::Size(50, 50));
+            if (detected_faces.size() > 0) {
+                cv::Rect rect = detected_faces[0];
+                modelt.detectPoint(image, current_shape, rect);
+                cv::Vec3d eav = modelt.EstimateHeadPose(current_shape);
+                modelt.drawPose(image, current_shape, eav, 50);
+                std::vector<cv::Point2f> pts = modelt.getPts();
+
+                for(int j=0; j < pts.size(); j++){
+                    cv::circle(image, pts[j], 2, cv::Scalar(0, 0, 255), -1);
+                }
+                cv::imshow("result", image);
+                cv::waitKey();
+            }
+        }
+        return 0;
+    }
+
     cv::VideoCapture mCamera(0);
     if(!mCamera.isOpened()){
         std::cout << "Camera opening failed..." << std::endl;
-        system("pause");
         return 0;
     }
     cv::Mat Image;

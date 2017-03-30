@@ -85,6 +85,18 @@ inline cv::Mat align_mean(cv::Mat mean, cv::Rect facebox, float scaling_x=1.0f, 
     return aligned_mean;
 }
 
+inline cv::Mat align_self_mean(cv::Mat mean, cv::Rect facebox)
+{
+    using cv::Mat;
+    Mat aligned_mean = mean.clone();
+    Mat aligned_mean_x = aligned_mean.colRange(0, aligned_mean.cols / 2);
+    Mat aligned_mean_y = aligned_mean.colRange(aligned_mean.cols / 2, aligned_mean.cols);
+    aligned_mean_x = aligned_mean_x * facebox.width + facebox.x;
+    aligned_mean_y = aligned_mean_y * facebox.height + facebox.y;
+    return aligned_mean;
+}
+
+
 
 inline cv::Mat align_mean(cv::Mat mean, cv::Mat landmarks)
 {
@@ -206,6 +218,44 @@ inline std::vector<std::string> split(const  std::string& s, const std::string& 
         pos = find_pos + delim_len;
     }
     return elems;
+}
+
+inline void ReadLablesFromTxt(std::vector<ImageLabel> &Imagelabels, std::string filepath) {
+    int landmarkNum = 74;
+	FILE* fin = fopen(filepath.c_str(), "r");
+	if (fin == NULL){
+		printf("%s is no exists", filepath.c_str());
+		throw "load annotate data error";
+	}
+	std::cout << "global landmark num: " << landmarkNum << std::endl;
+	std::string basename = "/home/sooda/data/photos/";
+	char filename[80];
+    int cnt = 0;
+	while(fscanf(fin, "%s%*c", filename) != EOF) {
+        cnt++;
+        ImageLabel mImageLabel;
+		std::string fullname = basename + filename;
+		std::cout << cnt << " " << fullname << std::endl;
+
+        mImageLabel.imagePath = fullname;
+
+		int left, top, right, bottom;
+		fscanf(fin, "%d %d %d %d%*c", &left, &top, &right, &bottom);
+
+		mImageLabel.faceBox[0] = left;
+		mImageLabel.faceBox[1] = top;
+		mImageLabel.faceBox[2] = right - left;
+		mImageLabel.faceBox[3] = bottom - top;
+
+		for(int j = 0; j < landmarkNum; j++) {
+			int x, y;
+			fscanf(fin, "%d %d%*c", &x, &y);
+            mImageLabel.landmarkPos[j] = x;
+            mImageLabel.landmarkPos[j+LandmarkPointsNum] = y;
+		}
+        Imagelabels.push_back(mImageLabel);
+	}
+	fclose(fin);
 }
 
 inline void ReadLabelsFromFile(std::vector<ImageLabel> &Imagelabels, std::string Path = "labels_ibug_300W_train.xml"){

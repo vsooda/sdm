@@ -17,10 +17,11 @@ using namespace cv;
 
 int main()
 {
+    std::string selfData = "mini2.txt";
     std::vector<ImageLabel> mImageLabels;
     if(!load_ImageLabels("mImageLabels-train.bin", mImageLabels)){
         mImageLabels.clear();
-        ReadLabelsFromFile(mImageLabels);
+        ReadLablesFromTxt(mImageLabels, selfData);
         save_ImageLabels(mImageLabels, "mImageLabels-train.bin");
     }
     std::cout << "训练数据一共有: " <<  mImageLabels.size() << std::endl;
@@ -46,9 +47,7 @@ int main()
 
     sdm model(LandmarkIndexs, eyes_index, mean_shape, HoGParams, LinearRegressors);
     model.train(mImageLabels);
-    save_sdm(model, "PCA-SDM-model.bin");
+    save_sdm(model, "self_sdm_model.bin");
 
-
-    system("pause");
     return 0;
 }
